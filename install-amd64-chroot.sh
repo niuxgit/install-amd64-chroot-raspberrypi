@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # install-amd64-chroot.sh
 # Bootstraps an amd64 Debian rootfs and installs a hardened helper (requires sudo to run).
+# Adds a 'nuke' subcommand to remove the environment later.
 
 set -euo pipefail
 
@@ -47,6 +48,8 @@ echo "[*] Installing hardened amd64-chroot helper (no auto-sudo)..."
 #   sudo amd64-chroot mount        # mount only
 #   sudo amd64-chroot umount       # unmount
 #   sudo amd64-chroot status       # show mounts/user info
+#   sudo amd64-chroot nuke [--yes] [--self]
+#       -> unmount, delete the chroot at \$ROOT; with --self also removes this helper
 
 set -euo pipefail
 
@@ -168,13 +171,38 @@ status_all(){
   [[ -f "$ROOT/etc/passwd" ]] && xin "getent passwd ${CHROOT_USER} || true"
 }
 
+nuke_env(){
+  if [[ "${1:-}" != "--yes" ]]; then
+    echo "[!] This will completely remove the chroot and the helper itself."
+    echo "    Type 'DELETE' to confirm:"
+    read -r ans
+    [[ "$ans" == "DELETE" ]] || { echo "Aborted."; exit 1; }
+  fi
+
+  msg "Unmounting any bind mounts..."
+  umount_all
+
+  if [[ -d "$ROOT" ]]; then
+    msg "Deleting rootfs at '$ROOT'..."
+    rm -rf --one-file-system "$ROOT"
+  fi
+
+  msg "Removing helper at /usr/local/bin/amd64-chroot ..."
+  rm -f /usr/local/bin/amd64-chroot
+
+  echo "[*] Environment fully removed."
+  echo "    To reinstall, rerun the installer script."
+  exit 0
+}
+
 case "$CMD" in
   enter|"")          mount_all; msg "Entering amd64 chroot at $ROOT as '${CHROOT_USER}'"; enter_as_user ;;
   root)              shift; if [[ $# -gt 0 ]]; then xin "$*"; else msg "Entering amd64 chroot at $ROOT as ROOT"; enter_as_root; fi ;;
   mount)             mount_all ;;
   umount|unmount)    umount_all ;;
   status)            status_all ;;
-  *)                 err "Usage: $0 [enter|root [-- CMD]|mount|umount|status]"; exit 2 ;;
+  nuke) shift; nuke_env "$@" ;;
+  *)                 err "Usage: $0 [enter|root [-- CMD]|mount|umount|status|nuke [--yes]]"; exit 2 ;;
 esac
 EOS
 
@@ -187,4 +215,6 @@ echo "      sudo amd64-chroot              # non-root user inside"
 echo "      sudo amd64-chroot root         # root shell inside"
 echo "      sudo amd64-chroot status       # show mounts"
 echo "      sudo amd64-chroot umount       # unmount binds"
+echo "      sudo amd64-chroot nuke --yes   # remove the chroot (asks to confirm unless --yes)"
+echo "      sudo amd64-chroot nuke --yes --self  # also remove the helper"
 echo "    Inside, 'uname -m' should show: x86_64"

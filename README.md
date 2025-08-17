@@ -1,22 +1,17 @@
 # amd64 Chroot on Raspberry Pi
 ## Installation
 
-<pre>niux@raspberrypi:~ $ sudo chmod +x install-amd64-chroot.sh
-niux@raspberrypi:~ $ sudo ./install-amd64-chroot.sh</pre>
+<pre>sudo chmod +x install-amd64-chroot.sh
+sudo ./install-amd64-chroot.sh</pre>
 
-## Entering
-<pre>niux@raspberrypi:~ $ sudo amd64-chroot root
-[*] Entering amd64 chroot at /opt/amd64-root 
-root@raspberrypi:/# uname -m x86_64 </pre>
+## Commands
+<pre>sudo amd64-chroot              # enter as non-root user (svc)
+sudo amd64-chroot root         # enter as root
+sudo amd64-chroot root -- CMD  # run one-off command as root
+sudo amd64-chroot status       # show mounts and user info
+sudo amd64-chroot umount       # unmount cleanly</pre>
 
-## Shared Folder
-<pre>root@raspberrypi:/# cd /mnt/shared
-root@raspberrypi:/mnt/shared# nano arf
-root@raspberrypi:/mnt/shared# exit
-exit
-niux@raspberrypi:~ $ cd /mnt/shared
-niux@raspberrypi:/mnt/shared $ ls
-arf
-niux@raspberrypi:/mnt/shared $ cat arf
-I like potatoes
-</pre>
+
+## Folders
+<pre>chroot rootfs                  /opt/amd64-root
+Shared folder                  /mnt/shared</pre>

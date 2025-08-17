@@ -9,8 +9,8 @@ sudo ./install-amd64-chroot.sh</pre>
 sudo amd64-chroot root         # enter as root
 sudo amd64-chroot root -- CMD  # run one-off command as root
 sudo amd64-chroot status       # show mounts and user info
-sudo amd64-chroot umount       # unmount cleanly</pre>
-sudo amd64-chroot nuke --yes   # delete environment
+sudo amd64-chroot umount       # unmount cleanly
+sudo amd64-chroot nuke --yes   # delete environment</pre>
 
 ## Folders
 <pre>chroot rootfs                  /opt/amd64-root

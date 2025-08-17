@@ -5,7 +5,7 @@
 niux@raspberrypi:~ $ sudo ./install-amd64-chroot.sh</pre>
 
 ## Entering
-<pre>niux@raspberrypi:~ $ sudo amd64-chroot
+<pre>niux@raspberrypi:~ $ sudo amd64-chroot root
 [*] Entering amd64 chroot at /opt/amd64-root 
 root@raspberrypi:/# uname -m x86_64 </pre>
 
